@@ -18,6 +18,8 @@ module "alb" {
 
   ]
 
+  create_security_group = false
+
   security_groups = [
 
     module.alb_sg.id
