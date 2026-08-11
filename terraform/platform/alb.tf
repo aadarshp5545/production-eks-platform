@@ -22,7 +22,7 @@ module "alb" {
 
   security_groups = [
 
-    module.alb_sg.id
+    module.alb_sg.security_group_id
 
   ]
 

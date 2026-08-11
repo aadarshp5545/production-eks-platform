@@ -8,7 +8,7 @@ module "eks_cluster" {
     data.aws_subnet.private_1.id,
     data.aws_subnet.private_2.id
   ]
-  security_group_ids = [module.eks_cluster_sg.id]
+  security_group_ids = [module.eks_cluster_sg.security_group_id]
 
   tags = merge(local.common_tags, {
     Name = "${local.name}-cluster"
