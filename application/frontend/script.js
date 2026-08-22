@@ -1,0 +1,1 @@
+console.log("Portfolio application loaded successfully.");

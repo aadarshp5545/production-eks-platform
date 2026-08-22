@@ -1,14 +1,52 @@
-name: Application
+name: Application Build & Deploy
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: YOUR_EKS_CLUSTER_NAME
+  ECR_REPOSITORY: YOUR_ECR_REPOSITORY_NAME
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build:
+  build-and-deploy:
+
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Build application image
-        run: echo "Build app image here"
+
+      # 1. Checkout application code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configure AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 3. Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 4. Build Docker image
+      - name: Build Docker image
+        working-directory: application
+        run: |
+          docker build \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+            .
+
+      # 5. Push Docker image to ECR
+      - name: Push Docker image
+        run: |
+          docker push \
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+
