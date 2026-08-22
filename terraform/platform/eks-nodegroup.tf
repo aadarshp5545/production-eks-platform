@@ -14,7 +14,7 @@ module "eks_nodegroup" {
   min_size     = 2
   max_size     = 4
 
-  instance_types  = ["t3.medium"]
+  instance_types = ["t3.medium"]
 
   tags = merge(local.common_tags, {
     Name = "${local.name}-nodegroup"

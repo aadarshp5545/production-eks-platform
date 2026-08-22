@@ -14,6 +14,23 @@ module "ecr" {
 
   repository_force_delete = false
 
+  lifecycle_policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Automatically expire older images, keeping only the most recent 10 images to control storage costs and maintain a tidy registry"
+        selection = {
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 10
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+
   tags = merge(
 
     local.common_tags,

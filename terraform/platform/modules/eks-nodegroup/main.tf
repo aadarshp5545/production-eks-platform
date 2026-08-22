@@ -6,7 +6,7 @@ resource "aws_eks_node_group" "this" {
   node_role_arn = var.node_role_arn
 
   subnet_ids = var.subnet_ids
-  
+
   instance_types = var.instance_types
 
   scaling_config {
