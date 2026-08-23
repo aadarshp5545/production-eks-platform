@@ -14,7 +14,22 @@ module "ecr" {
 
   repository_force_delete = false
 
-  lifecycle_policy = jsonencode({
+  tags = merge(
+
+    local.common_tags,
+
+    {
+      Name = "${local.name}-repository"
+    }
+
+  )
+
+}
+
+resource "aws_ecr_lifecycle_policy" "this" {
+  repository = "${local.name}-repository"
+
+  policy = jsonencode({
     rules = [
       {
         rulePriority = 1
@@ -31,14 +46,6 @@ module "ecr" {
     ]
   })
 
-  tags = merge(
-
-    local.common_tags,
-
-    {
-      Name = "${local.name}-repository"
-    }
-
-  )
+  depends_on = [module.ecr]
 
 }
