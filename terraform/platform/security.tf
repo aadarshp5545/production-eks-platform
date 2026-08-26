@@ -32,10 +32,6 @@ module "eks_cluster_sg" {
 
       description = "Allow All"
 
-      from_port = 0
-
-      to_port = 0
-
       protocol = "-1"
 
       cidr_ipv4 = "0.0.0.0/0"
@@ -91,10 +87,6 @@ module "eks_node_sg" {
     {
 
       description = "Allow All"
-
-      from_port = 0
-
-      to_port = 0
 
       protocol = "-1"
 
@@ -165,10 +157,6 @@ module "alb_sg" {
     {
 
       description = "Allow All"
-
-      from_port = 0
-
-      to_port = 0
 
       protocol = "-1"
 
