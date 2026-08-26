@@ -27,12 +27,12 @@ output "private_subnet_ids" {
 }
 output "repository_url" {
 
-  value = module.ecr.repository_url
+  value = aws_ecr_repository.this.repository_url
 
 }
 
 output "repository_arn" {
 
-  value = module.ecr.repository_arn
+  value = aws_ecr_repository.this.arn
 
 }
