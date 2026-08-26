@@ -22,9 +22,9 @@ resource "aws_vpc_security_group_ingress_rule" "this" {
 
   description = try(each.value.description, null)
 
-  from_port = each.value.from_port
+  from_port = each.value.protocol == "-1" ? null : try(each.value.from_port, null)
 
-  to_port = each.value.to_port
+  to_port = each.value.protocol == "-1" ? null : try(each.value.to_port, null)
 
   ip_protocol = each.value.protocol
 

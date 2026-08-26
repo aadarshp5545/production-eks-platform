@@ -15,8 +15,8 @@ variable "ingress_rules" {
   type = list(object({
 
     description = optional(string)
-    from_port   = number
-    to_port     = number
+    from_port   = optional(number)
+    to_port     = optional(number)
     protocol    = string
 
     cidr_ipv4 = optional(string)
@@ -37,8 +37,8 @@ variable "egress_rules" {
   type = list(object({
 
     description = optional(string)
-    from_port   = number
-    to_port     = number
+    from_port   = optional(number)
+    to_port     = optional(number)
     protocol    = string
 
     cidr_ipv4 = optional(string)
