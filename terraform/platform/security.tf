@@ -179,3 +179,14 @@ module "alb_sg" {
   )
 
 }
+
+# Allow ALB to reach cluster/worker nodes on application port (8000)
+resource "aws_security_group_rule" "allow_alb_to_cluster_app" {
+  description              = "Allow ALB to reach pods on port 8000"
+  type                     = "ingress"
+  from_port                = 8000
+  to_port                  = 8000
+  protocol                 = "tcp"
+  security_group_id        = module.eks_cluster_sg.security_group_id
+  source_security_group_id = module.alb_sg.security_group_id
+}
