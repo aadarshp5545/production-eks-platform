@@ -12,13 +12,13 @@ module "eks_cluster_sg" {
 
     {
 
-      description = "HTTPS"
+      description = "Allow All Inbound"
 
-      from_port = 443
+      from_port = 0
 
-      to_port = 443
+      to_port = 0
 
-      protocol = "tcp"
+      protocol = "-1"
 
       cidr_ipv4 = "0.0.0.0/0"
 
@@ -43,21 +43,14 @@ module "eks_cluster_sg" {
   tags = merge(
 
     local.common_tags,
-
+    },
     {
-
-      Name = "${local.name}-cluster-sg"
-
+      description = "Allow All Inbound"
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_ipv4 = "0.0.0.0/0"
     }
-
-  )
-
-}
-
-module "eks_node_sg" {
-
-  source = "./modules/security-group"
-
   name = "${local.name}-node-sg"
 
   description = "EKS Worker Node Security Group"
@@ -68,15 +61,15 @@ module "eks_node_sg" {
 
     {
 
-      description = "Node Communication"
+      description = "Allow All Inbound"
 
       from_port = 0
 
-      to_port = 65535
+      to_port = 0
 
-      protocol = "tcp"
+      protocol = "-1"
 
-      cidr_ipv4 = data.aws_vpc.main.cidr_block
+      cidr_ipv4 = "0.0.0.0/0"
 
     }
 
@@ -149,6 +142,19 @@ module "alb_sg" {
       cidr_ipv4 = "0.0.0.0/0"
 
     }
+     {
+
+      description = "All"
+
+      from_port = 0
+
+      to_port = 0
+
+      protocol = "-1"
+
+      cidr_ipv4 = "0.0.0.0/0"
+
+    }
 
   ]
 
@@ -180,13 +186,3 @@ module "alb_sg" {
 
 }
 
-# Allow ALB to reach cluster/worker nodes on application port (8000)
-resource "aws_security_group_rule" "allow_alb_to_cluster_app" {
-  description              = "Allow ALB to reach pods on port 8000"
-  type                     = "ingress"
-  from_port                = 8000
-  to_port                  = 8000
-  protocol                 = "tcp"
-  security_group_id        = module.eks_cluster_sg.security_group_id
-  source_security_group_id = module.alb_sg.security_group_id
-}
