@@ -46,9 +46,10 @@ module "alb" {
 
         enabled = true
 
+
         protocol = "HTTP"
 
-        path = "/"
+        path = "/health"
 
         port = "traffic-port"
 
