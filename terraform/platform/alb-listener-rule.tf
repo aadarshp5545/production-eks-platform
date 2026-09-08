@@ -13,7 +13,7 @@ resource "aws_lb_listener_rule" "portfolio_path" {
 
   action {
     type             = "forward"
-    target_group_arn = module.alb.target_group_arns["app"]
+    target_group_arn = data.aws_lb_listener.http.default_action[0].target_group_arn
   }
 
   condition {
