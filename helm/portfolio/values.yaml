@@ -1,0 +1,27 @@
+replicaCount: 2
+
+image:
+  repository: 901823447831.dkr.ecr.us-east-1.amazonaws.com/production-eks-platform-dev-repository
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8000
+  targetPort: 8000
+
+containerPort: 8000
+
+targetGroupBinding:
+  enabled: true
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:901823447831:targetgroup/appb67f095d7341cc84eb758a96df/b737e5bcc8df2305
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+healthCheck:
+  path: /health

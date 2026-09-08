@@ -8,9 +8,8 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  #EKS_CLUSTER_NAME: 
+  EKS_CLUSTER_NAME: production-eks-platform-dev
   ECR_REPOSITORY: production-eks-platform-dev-repository
-  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-deploy:
@@ -19,11 +18,11 @@ jobs:
 
     steps:
 
-      # 1. Checkout application code
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Configure AWS
+      # 2. Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -41,12 +40,43 @@ jobs:
         working-directory: application
         run: |
           docker build \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest \
             .
 
       # 5. Push Docker image to ECR
       - name: Push Docker image
         run: |
           docker push \
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
 
+      # 6. Configure kubectl for EKS
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.EKS_CLUSTER_NAME }}
+
+      # 7. Verify EKS connection
+      - name: Verify EKS connection
+        run: |
+          kubectl get nodes
+
+      # 8. Deploy application using Helm
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install portfolio ./helm/portfolio \
+            --namespace default \
+            --create-namespace
+
+      # 9. Verify deployment rollout
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/portfolio --timeout=180s
+
+      # 10. Verify application resources
+      - name: Verify application
+        run: |
+          kubectl get deployment
+          kubectl get pods
+          kubectl get service
+          kubectl get targetgroupbinding
