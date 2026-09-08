@@ -8,6 +8,7 @@ image:
 service:
   port: 8000
   targetPort: 8000
+  annotations: {}
 
 containerPort: 8000
 
