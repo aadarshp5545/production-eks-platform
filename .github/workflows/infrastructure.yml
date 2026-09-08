@@ -2,6 +2,11 @@ name: Terraform Infrastructure
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Action mode: apply or destroy'
+        required: false
+        default: 'apply'
 
 permissions:
   contents: read
@@ -45,10 +50,16 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
-      - name: Terraform Plan
+      - name: Terraform Plan (apply)
+        if: ${{ github.event.inputs.mode != 'destroy' }}
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -out=tfplan
 
+      - name: Terraform Plan (destroy)
+        if: ${{ github.event.inputs.mode == 'destroy' }}
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform plan -destroy -out=tfplan
+
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform destroy -auto-approve tfplan
+        run: terraform apply -auto-approve tfplan
